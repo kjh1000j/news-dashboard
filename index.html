@@ -1,111 +1,63 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>세계 뉴스 브리핑</title>
-  <style>
-    :root {
-      --bg: #f8f7f4;
-      --card: #ffffff;
-      --text: #1a1a18;
-      --muted: #6b6b67;
-      --hint: #9c9a92;
-      --border: rgba(0,0,0,0.1);
-      --red: #C04828;
-      --blue: #185FA5;
-      --green: #3B6D11;
-      --gray: #888780;
-      --blue-bg: #E6F1FB;
-      --amber-bg: #FAEEDA;
-      --blue-text: #0C447C;
-      --amber-text: #633806;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-    .page { max-width: 780px; margin: 0 auto; padding: 2rem 1rem 4rem; }
-
-    /* header */
-    .header { text-align: center; margin-bottom: 2rem; }
-    .header-date { font-size: 11px; font-weight: 600; letter-spacing: .1em; color: var(--hint); margin-bottom: 6px; text-transform: uppercase; }
-    .header-title { font-size: 26px; font-weight: 600; color: var(--text); line-height: 1.3; margin-bottom: 6px; }
-    .header-sub { font-size: 13px; color: var(--muted); }
-
-    /* channel badges */
-    .channels { display: flex; gap: 7px; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
-    .ch { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .ch-us { background: var(--blue-bg); color: var(--blue-text); }
-    .ch-uk { background: var(--amber-bg); color: var(--amber-text); }
-    .ch-dot { width: 6px; height: 6px; border-radius: 50%; }
-    .us-dot { background: var(--blue); }
-    .uk-dot { background: #BA7517; }
-
-    /* section label */
-    .sec { display: flex; align-items: center; gap: 10px; margin: 0 0 1rem; }
-    .sec-line { flex: 1; height: 1px; background: var(--border); }
-    .sec-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--hint); white-space: nowrap; }
-
-    /* heatmap */
-    .heatmap { display: flex; flex-direction: column; gap: 6px; margin-bottom: 2rem; }
-    .hm-row { display: grid; grid-template-columns: 110px 1fr 20px; align-items: center; gap: 10px; }
-    .hm-label { font-size: 12px; color: var(--muted); }
-    .hm-wrap { height: 20px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden; }
-    .hm-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; }
-    .hm-bar span { font-size: 10px; font-weight: 700; }
-    .hm-count { font-size: 13px; font-weight: 700; text-align: right; }
-
-    /* story cards */
-    .stories { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 2rem; }
-    .story { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px 12px 17px; position: relative; overflow: hidden; text-decoration: none; display: block; transition: transform .15s, box-shadow .15s; }
-    .story:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-    .story.top { grid-column: 1 / -1; }
-    .story-accent { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
-    .story-count { position: absolute; top: 10px; right: 12px; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
-    .story-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
-    .badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
-    .story-headline { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.45; margin-bottom: 4px; padding-right: 28px; }
-    .story-body { font-size: 11px; color: var(--muted); line-height: 1.6; }
-    .story-link { position: absolute; bottom: 10px; right: 12px; font-size: 11px; color: var(--hint); }
-
-    /* others */
-    .others { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-    .other { display: flex; align-items: flex-start; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; text-decoration: none; transition: opacity .15s; }
-    .other:hover { opacity: .75; }
-    .other-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
-    .other-text { font-size: 12px; color: var(--text); line-height: 1.4; }
-    .other-src { font-size: 10px; color: var(--hint); margin-top: 2px; }
-
-    /* legend */
-    .legend { display: flex; gap: 14px; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
-    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
-    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
-
-    /* loading state */
-    .loading { text-align: center; padding: 4rem 1rem; color: var(--muted); }
-    .loading-spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 540px) {
-      .stories { grid-template-columns: 1fr; }
-      .others { grid-template-columns: 1fr; }
-      .story.top { grid-column: 1; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>세계 뉴스 브리핑 — 2026년 3월 27일 금요일</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7f4;color:#1a1a18;min-height:100vh}
+.page{max-width:780px;margin:0 auto;padding:2rem 1rem 4rem}
+.header{text-align:center;margin-bottom:1.8rem}
+.hd{font-size:11px;font-weight:600;letter-spacing:.1em;color:#9c9a92;margin-bottom:5px}
+.ht{font-size:24px;font-weight:600;margin-bottom:5px}
+.hs{font-size:13px;color:#6b6b67}
+.channels{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-bottom:1.8rem}
+.ch{display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.ch-us{background:#E6F1FB;color:#0C447C}.ch-uk{background:#FAEEDA;color:#633806}
+.ch-dot{width:5px;height:5px;border-radius:50%}
+.us-dot{background:#185FA5}.uk-dot{background:#BA7517}
+.sec{display:flex;align-items:center;gap:10px;margin:0 0 .9rem}
+.sec-line{flex:1;height:1px;background:rgba(0,0,0,.1)}
+.sec-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:#9c9a92;white-space:nowrap}
+.heatmap{display:flex;flex-direction:column;gap:5px;margin-bottom:1.8rem}
+.hm-row{display:grid;grid-template-columns:110px 1fr 22px;align-items:center;gap:8px}
+.hm-label{font-size:11px;color:#6b6b67}
+.hm-wrap{height:18px;background:rgba(0,0,0,.05);border-radius:3px;overflow:hidden}
+.hm-bar{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:6px}
+.hm-bar span{font-size:10px;font-weight:500}
+.hm-count{font-size:12px;font-weight:600;text-align:right}
+.stories{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.8rem}
+.story{background:#fff;border:1px solid rgba(0,0,0,.09);border-radius:14px;padding:10px 12px 10px 15px;position:relative;overflow:hidden;text-decoration:none;display:block;transition:transform .15s,box-shadow .15s}
+.story:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.story.top{grid-column:1/-1}
+.story-accent{position:absolute;left:0;top:0;bottom:0;width:4px}
+.story-count{position:absolute;top:8px;right:10px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.story-badges{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:5px}
+.sbadge{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600}
+.story-headline{font-size:12px;font-weight:600;color:#1a1a18;line-height:1.4;margin-bottom:3px;padding-right:26px}
+.story-body{font-size:10px;color:#6b6b67;line-height:1.5}
+.story-link{position:absolute;bottom:8px;right:10px;font-size:10px;color:#9c9a92}
+.others{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.other{display:flex;align-items:flex-start;gap:7px;background:#fff;border:1px solid rgba(0,0,0,.09);border-radius:10px;padding:8px 11px;text-decoration:none;transition:opacity .15s}
+.other:hover{opacity:.75}
+.other-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.other-text{font-size:11px;color:#1a1a18;line-height:1.4}
+.other-src{font-size:9px;color:#9c9a92;margin-top:2px}
+.legend{display:flex;gap:12px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:#6b6b67}
+.legend-dot{width:7px;height:7px;border-radius:50%}
+.updated{text-align:center;font-size:11px;color:#9c9a92;margin-top:1rem}
+@media(max-width:540px){.stories,.others{grid-template-columns:1fr}.story.top{grid-column:1}}
+</style>
 </head>
 <body>
 <div class="page">
-
   <div class="header">
-    <div class="header-date" id="today-date">로딩 중...</div>
-    <div class="header-title">세계 뉴스 브리핑</div>
-    <div class="header-sub">CNN · Fox News · NBC News · BBC · Sky News — 5개 채널 자동 수집</div>
+    <div class="hd">2026년 3월 27일 금요일 · 글로벌 뉴스 브리핑</div>
+    <div class="ht">세계 뉴스 브리핑</div>
+    <div class="hs">CNN · Fox News · NBC News · BBC · Sky News — 5개 채널 자동 수집</div>
   </div>
-
   <div class="channels">
     <div class="ch ch-us"><span class="ch-dot us-dot"></span>CNN</div>
     <div class="ch ch-us"><span class="ch-dot us-dot"></span>Fox News</div>
@@ -113,83 +65,105 @@
     <div class="ch ch-uk"><span class="ch-dot uk-dot"></span>BBC News</div>
     <div class="ch ch-uk"><span class="ch-dot uk-dot"></span>Sky News</div>
   </div>
-
-  <div id="content">
-    <div class="loading">
-      <div class="loading-spinner"></div>
-      <div style="font-size:14px;font-weight:500;margin-bottom:6px">뉴스 브리핑 준비 중</div>
-      <div style="font-size:12px">Claude에게 "현재 세계 뉴스" 라고 요청하면<br>이 페이지가 자동으로 업데이트됩니다</div>
-    </div>
-  </div>
-
+  <div class="sec"><div class="sec-line"></div><div class="sec-label">공통 보도 빈도</div><div class="sec-line"></div></div>
+  <div class="heatmap"><div class="hm-row">
+        <div class="hm-label">경제</div>
+        <div class="hm-wrap"><div class="hm-bar" style="width:40%;background:#88878022">
+          <span style="color:#888780">█████</span>
+        </div></div>
+        <div class="hm-count" style="color:#888780">8</div>
+      </div><div class="hm-row">
+        <div class="hm-label">정치</div>
+        <div class="hm-wrap"><div class="hm-bar" style="width:40%;background:#88878022">
+          <span style="color:#888780">█████</span>
+        </div></div>
+        <div class="hm-count" style="color:#888780">6</div>
+      </div><div class="hm-row">
+        <div class="hm-label">사회</div>
+        <div class="hm-wrap"><div class="hm-bar" style="width:100%;background:#C0482822">
+          <span style="color:#C04828">█████</span>
+        </div></div>
+        <div class="hm-count" style="color:#C04828">5</div>
+      </div><div class="hm-row">
+        <div class="hm-label">국제</div>
+        <div class="hm-wrap"><div class="hm-bar" style="width:80%;background:#185FA522">
+          <span style="color:#185FA5">████</span>
+        </div></div>
+        <div class="hm-count" style="color:#185FA5">4</div>
+      </div><div class="hm-row">
+        <div class="hm-label">기술</div>
+        <div class="hm-wrap"><div class="hm-bar" style="width:60%;background:#3B6D1122">
+          <span style="color:#3B6D11">███</span>
+        </div></div>
+        <div class="hm-count" style="color:#3B6D11">3</div>
+      </div><div class="hm-row">
+        <div class="hm-label">환경</div>
+        <div class="hm-wrap"><div class="hm-bar" style="width:40%;background:#88878022">
+          <span style="color:#888780">██</span>
+        </div></div>
+        <div class="hm-count" style="color:#888780">2</div>
+      </div></div>
+  <div class="sec"><div class="sec-line"></div><div class="sec-label">중복 보도 통합 요약</div><div class="sec-line"></div></div>
+  <div class="stories"><a class="story top" href="https://www.cnn.com" target="_blank" rel="noopener">
+        <div class="story-accent" style="background:#C04828"></div>
+        <div class="story-count" style="background:#C04828">5</div>
+        <div class="story-badges"><span class="sbadge" style="background:#C0482818;color:#C04828">CNN</span><span class="sbadge" style="background:#C0482818;color:#C04828">Fox</span><span class="sbadge" style="background:#C0482818;color:#C04828">NBC</span><span class="sbadge" style="background:#C0482818;color:#C04828">BBC</span><span class="sbadge" style="background:#C0482818;color:#C04828">Sky</span></div>
+        <div class="story-headline">미국 경제 회복</div>
+        <div class="story-body">미국 경제가 회복되고 있다. 주요 지표가 개선되었다.</div>
+        <span class="story-link">↗</span>
+      </a><a class="story" href="https://www.bbc.com" target="_blank" rel="noopener">
+        <div class="story-accent" style="background:#185FA5"></div>
+        <div class="story-count" style="background:#185FA5">4</div>
+        <div class="story-badges"><span class="sbadge" style="background:#185FA518;color:#185FA5">CNN</span><span class="sbadge" style="background:#185FA518;color:#185FA5">Fox</span><span class="sbadge" style="background:#185FA518;color:#185FA5">NBC</span><span class="sbadge" style="background:#185FA518;color:#185FA5">BBC</span></div>
+        <div class="story-headline">유럽 정치 위기</div>
+        <div class="story-body">유럽의 정치 위기가 심화하고 있다. 주요 국가들이 대응에 나서고 있다.</div>
+        <span class="story-link">↗</span>
+      </a></div>
+  <div class="sec"><div class="sec-line"></div><div class="sec-label">단독·개별 보도</div><div class="sec-line"></div></div>
+  <div class="others"><a class="other" href="https://www.cnn.com" target="_blank" rel="noopener">
+        <div class="other-dot" style="background:#185FA5"></div>
+        <div>
+          <div class="other-text">중국 기술 발전</div>
+          <div class="other-src">CNN ↗</div>
+        </div>
+      </a><a class="other" href="https://www.bbc.com" target="_blank" rel="noopener">
+        <div class="other-dot" style="background:#BA7517"></div>
+        <div>
+          <div class="other-text">일본 환경 정책</div>
+          <div class="other-src">BBC ↗</div>
+        </div>
+      </a><a class="other" href="https://www.fox.com" target="_blank" rel="noopener">
+        <div class="other-dot" style="background:#185FA5"></div>
+        <div>
+          <div class="other-text">한국 사회 문제</div>
+          <div class="other-src">Fox ↗</div>
+        </div>
+      </a><a class="other" href="https://www.sky.com" target="_blank" rel="noopener">
+        <div class="other-dot" style="background:#BA7517"></div>
+        <div>
+          <div class="other-text">독일 경제 성장</div>
+          <div class="other-src">Sky ↗</div>
+        </div>
+      </a><a class="other" href="https://www.nbc.com" target="_blank" rel="noopener">
+        <div class="other-dot" style="background:#185FA5"></div>
+        <div>
+          <div class="other-text">프랑스 정치 상황</div>
+          <div class="other-src">NBC ↗</div>
+        </div>
+      </a><a class="other" href="https://www.cnn.com" target="_blank" rel="noopener">
+        <div class="other-dot" style="background:#185FA5"></div>
+        <div>
+          <div class="other-text">호주 국제 관계</div>
+          <div class="other-src">CNN ↗</div>
+        </div>
+      </a></div>
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#C04828"></div>5개 채널</div>
     <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>4개 채널</div>
     <div class="legend-item"><div class="legend-dot" style="background:#3B6D11"></div>3개 채널</div>
     <div class="legend-item"><div class="legend-dot" style="background:#888780"></div>2개 채널</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>🇺🇸 미국</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>🇬🇧 영국</div>
   </div>
-
+  <div class="updated">마지막 업데이트: 2026. 3. 27. 오후 9:41:59</div>
 </div>
-
-<script>
-  const dateEl = document.getElementById('today-date');
-  const now = new Date();
-  const opts = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-  dateEl.textContent = now.toLocaleDateString('ko-KR', opts) + ' · 글로벌 뉴스 브리핑';
-
-  /* ── Pipedream이 아래 함수를 호출해서 뉴스를 주입합니다 ── */
-  window.renderNews = function(data) {
-    const colors = { 5: '#C04828', 4: '#185FA5', 3: '#3B6D11', 2: '#888780' };
-    const pct    = { 5: 100, 4: 80, 3: 60, 2: 40 };
-    let html = '';
-
-    /* heatmap */
-    html += `<div class="sec"><div class="sec-line"></div><div class="sec-label">공통 보도 빈도</div><div class="sec-line"></div></div><div class="heatmap">`;
-    (data.heatmap || []).forEach(d => {
-      const c = colors[d.count] || '#888780';
-      html += `<div class="hm-row">
-        <div class="hm-label">${d.label}</div>
-        <div class="hm-wrap"><div class="hm-bar" style="width:${pct[d.count]||40}%;background:${c}22">
-          <span style="color:${c}">${'█'.repeat(d.count)}</span>
-        </div></div>
-        <div class="hm-count" style="color:${c}">${d.count}</div>
-      </div>`;
-    });
-    html += `</div>`;
-
-    /* shared stories */
-    html += `<div class="sec"><div class="sec-line"></div><div class="sec-label">중복 보도 통합 요약</div><div class="sec-line"></div></div><div class="stories">`;
-    (data.stories || []).forEach((s, i) => {
-      const c = colors[s.count] || '#888780';
-      const isTop = i === 0;
-      const badges = (s.sources || []).map(src => `<span class="badge" style="background:${c}18;color:${c}">${src}</span>`).join('');
-      html += `<a class="story${isTop?' top':''}" href="${s.url||'#'}" target="_blank" rel="noopener">
-        <div class="story-accent" style="background:${c}"></div>
-        <div class="story-count" style="background:${c}">${s.count}</div>
-        <div class="story-badges">${badges}</div>
-        <div class="story-headline">${s.headline}</div>
-        <div class="story-body">${s.summary}</div>
-        <span class="story-link">↗</span>
-      </a>`;
-    });
-    html += `</div>`;
-
-    /* others */
-    html += `<div class="sec"><div class="sec-line"></div><div class="sec-label">단독·개별 보도</div><div class="sec-line"></div></div><div class="others">`;
-    (data.others || []).forEach(o => {
-      const dot = o.country === 'us' ? '#185FA5' : '#BA7517';
-      html += `<a class="other" href="${o.url||'#'}" target="_blank" rel="noopener">
-        <div class="other-dot" style="background:${dot}"></div>
-        <div><div class="other-text">${o.text}</div><div class="other-src">${o.src} ↗</div></div>
-      </a>`;
-    });
-    html += `</div>`;
-
-    document.getElementById('content').innerHTML = html;
-    dateEl.textContent = (data.date || new Date().toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric',weekday:'long'})) + ' · 글로벌 뉴스 브리핑';
-  };
-</script>
 </body>
 </html>
