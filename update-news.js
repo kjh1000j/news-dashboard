@@ -53,8 +53,9 @@ async function collectRSS() {
   return items;
 }
 
-// ── 2. Gemini 분석 ──
+// ── 2. Gemini 가 안되서 grok으로 바꿈 ──
 async function analyzeWithGemini(items) {
+  const GROQ_API_KEY = process.env.GROQ_API_KEY;
   const newsText = items.map((item, i) =>
     '[' + (i+1) + '][' + item.source + '] ' + item.title + ' | ' + item.link
   ).join('\n');
@@ -74,24 +75,29 @@ async function analyzeWithGemini(items) {
     '- url은 위목록 실제URL만 사용\n' +
     '- 반드시 유효한 JSON만 출력';
 
-  const res = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_API_KEY,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.2, maxOutputTokens: 4000 }
-      })
-    }
-  );
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + GROQ_API_KEY
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      max_tokens: 3000,
+      temperature: 0.2,
+      messages: [
+        { role: 'system', content: '당신은 세계 뉴스 분석 전문가입니다. 반드시 유효한 JSON만 출력하세요.' },
+        { role: 'user', content: prompt }
+      ]
+    })
+  });
 
   const data = await res.json();
-  if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-    throw new Error('Gemini 응답 없음: ' + JSON.stringify(data).slice(0, 300));
+  if (!data.choices?.[0]?.message?.content) {
+    throw new Error('Groq 응답 없음: ' + JSON.stringify(data).slice(0, 300));
   }
 
-  const raw = data.candidates[0].content.parts[0].text;
+  const raw = data.choices[0].message.content;
   const cleaned = raw.replace(/```json/g, '').replace(/```/g, '').trim();
   const match = cleaned.match(/\{[\s\S]*\}/);
   if (!match) throw new Error('JSON 파싱 실패');
