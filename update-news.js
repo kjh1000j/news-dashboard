@@ -66,44 +66,73 @@ async function translate(text) {
 
 // ── 3. 중복 분석 ──
 function analyzeStories(items) {
-  const titleMap = {};
+  const used = new Set();
+  const stories = [];
+  const others = [];
+
+  // 소스별로 그룹핑
+  const bySource = {};
   items.forEach(item => {
-    const words = item.title.toLowerCase()
+    if (!bySource[item.source]) bySource[item.source] = [];
+    bySource[item.source].push(item);
+  });
+
+  // 핵심 키워드 추출 (3글자 이상 단어)
+  function getKeywords(title) {
+    return title.toLowerCase()
       .replace(/[^a-z0-9\s]/g, '')
       .split(' ')
-      .filter(w => w.length > 4)
-      .slice(0, 5)
-      .join(' ');
-    if (!titleMap[words]) {
-      titleMap[words] = { items: [], sources: new Set() };
-    }
-    titleMap[words].items.push(item);
-    titleMap[words].sources.add(item.source);
-  });
+      .filter(w => w.length >= 3);
+  }
 
-  const stories = [];
-  const usedLinks = new Set();
+  // 두 제목의 공통 키워드 수 계산
+  function commonKeywords(t1, t2) {
+    const k1 = new Set(getKeywords(t1));
+    const k2 = new Set(getKeywords(t2));
+    let count = 0;
+    k1.forEach(k => { if (k2.has(k)) count++; });
+    return count;
+  }
 
-  Object.values(titleMap).forEach(group => {
-    if (group.sources.size >= 2) {
-      const rep = group.items[0];
-      if (!usedLinks.has(rep.link)) {
-        usedLinks.add(rep.link);
-        stories.push({
-          count: group.sources.size,
-          sources: [...group.sources],
-          title: rep.title,
-          link: rep.link,
-          country: rep.country
-        });
+  // 모든 아이템 쌍 비교해서 중복 그룹 찾기
+  const groups = [];
+  items.forEach((item, i) => {
+    if (used.has(i)) return;
+    const group = { items: [item], sources: new Set([item.source]) };
+    items.forEach((other, j) => {
+      if (i === j || used.has(j)) return;
+      if (item.source === other.source) return;
+      if (commonKeywords(item.title, other.title) >= 2) {
+        group.items.push(other);
+        group.sources.add(other.source);
+        used.add(j);
       }
+    });
+    if (group.sources.size >= 2) {
+      used.add(i);
+      groups.push(group);
     }
   });
 
-  const others = items.filter(item => !usedLinks.has(item.link)).slice(0, 8);
+  // 그룹을 stories로 변환
+  groups.forEach(group => {
+    stories.push({
+      count: group.sources.size,
+      sources: [...group.sources],
+      title: group.items[0].title,
+      link: group.items[0].link,
+      country: group.items[0].country
+    });
+  });
 
   stories.sort((a, b) => b.count - a.count);
-  return { stories: stories.slice(0, 8), others };
+
+  // 나머지는 others
+  items.forEach((item, i) => {
+    if (!used.has(i)) others.push(item);
+  });
+
+  return { stories: stories.slice(0, 8), others: others.slice(0, 8) };
 }
 
 // ── 4. HTML 생성 ──
