@@ -4,7 +4,8 @@ on:
   schedule:
     - cron: '50 22 * * *'  # 한국시간 매일 오전 7:50 (UTC 22:50)
   workflow_dispatch:        # 수동 실행 버튼도 추가
-
+permissions:
+  contents: write
 jobs:
   update-news:
     runs-on: ubuntu-latest
